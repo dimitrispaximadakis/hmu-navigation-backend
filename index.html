@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <title>HMU Navigation</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+          height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+
+         /**
+         * @function initMap() implements main funtionality of the front-end, combines data fetched from the server.
+         * 
+         * 
+         * @return an Array of coordinates.
+         *
+         */
+        function initMap(){ 
+
+            /* Maping all needed endpoints to request. */   
+            let endpoints = [  
+            'http://localhost:3000/api/shortest-path/1/19',
+            'http://localhost:3000/api/points'
+            ];
+
+            /* Requesting all the endpoints at the same time. */
+            Promise.all(endpoints.map((endpoint) => axios.get(endpoint)))
+            .then( 
+                axios.spread((response1, response2) => {  // Data from requests.
+
+            /* Storing fetched data in order to be parsed. */
+            let shortestPathResponse = response1.data.path;
+            let pointsResponse = response2.data;
+
+            console.log('shortestPathResponse: ', shortestPathResponse);
+            console.log('pointsResponse: ', pointsResponse);
+
+        
+
+            /**
+            * Gets the coordinates of each of each node that the path is using
+            * and formats the data in order to be recognisable by Google Maps API.
+            *
+            * @param  {Object} shortestPath - calculated shortest path in a graph data model.
+            * @param  {Array} points - the sums of points that exist in database.
+            * @return {Array} an Array of coordinates.
+            *
+            */
+            const getCoordinates = (shortestPathResponse, pointsResponse) => {
+                
+                let filteredCoordinates = pointsResponse.filter(point => shortestPathResponse.includes(`node${point.id}`));
+                console.log(filteredCoordinates);
+                const coordinatesArray = filteredCoordinates.map(node => {
+                    return { lat: node.latitude, lng: node.longitude };
+            })
+            console.log(coordinatesArray);
+
+                return coordinatesArray
+            }
+
+
+            /* Google Maps API */
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 19,
+                center: {lat:   35.31947821139403, lng: 25.1024423862297},
+                mapTypeId: 'satellite',
+                markers:[]
+            });
+
+            const flightPath = new google.maps.Polyline({
+                path: getCoordinates(shortestPathResponse, pointsResponse),  // Setting our path.
+                geodesic: true,
+                strokeColor: "#232323",
+                strokeOpacity: 1.0,
+                strokeWeight: 5,
+            });
+
+            flightPath.setMap(map);
+
+            }));
+        }
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Bc0HeMeimyIRy33uT2SQpv6gunODUus&callback=initMap"></script>
+</body>
+</html>
