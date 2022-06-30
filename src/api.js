@@ -50,9 +50,9 @@ app.get('*', function (req, res) {
     res.status(404).send('Error 404: Page Not Found');
 });
 
-/* Starting the server at port 3000 */
+/* Starting the server at port process.env.PORT or 3000 */
 app.listen(port, () => {
-    console.log('Server in now listening.');
+    console.log(`Server in now listening on port ${port}.`);
 })
 
 /* Connecting to database */
