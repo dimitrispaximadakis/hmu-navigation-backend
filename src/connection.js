@@ -2,7 +2,8 @@ const { Client } = require('pg')
 
 /* Connecting to the database using the needed credentials. */
 const client = new Client({
-    // host: "localhost",
+    /* Connection Setting if you are using localhost. */
+    // host: "localhost",  
     // user: "postgres",
     // port: 5432,
     // password: "root",
