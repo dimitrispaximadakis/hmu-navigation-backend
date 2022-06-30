@@ -7,6 +7,7 @@ const findShortestPath = require('../shortestPath');
 /* Setting express */
 const express = require('express');
 const app = express();
+const port = process.env.PORT || 3000;
 
 /* Allow CORS */
 const cors = require('cors');
@@ -50,8 +51,8 @@ app.get('*', function (req, res) {
 });
 
 /* Starting the server at port 3000 */
-app.listen(3000, () => {
-    console.log('Server in now listening at 3000 port.');
+app.listen(port, () => {
+    console.log('Server in now listening.');
 })
 
 /* Connecting to database */
